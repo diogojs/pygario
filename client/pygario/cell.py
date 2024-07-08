@@ -12,6 +12,7 @@ from pygario.viewport import Viewport
 class Cell(GameObject):
     radius: float
     color: Union[tuple, Color]
+    enabled: bool = True
     font: pygame.font.Font = field(init=False)
 
     def __post_init__(self):
