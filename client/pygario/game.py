@@ -74,7 +74,8 @@ class Game:
         """
         Create Game main variables (player, map, cells/blobs)
         """
-        self.player = Blob(0, Vector2D(1500, 850), INITIAL_RADIUS, Color.BLUE)
+        initial_pos = Vector2D(randint(INITIAL_RADIUS, MAP_WIDTH-INITIAL_RADIUS), randint(INITIAL_RADIUS, MAP_HEIGHT-INITIAL_RADIUS))
+        self.player = Blob(0, initial_pos, INITIAL_RADIUS, Color.BLUE)
         self.viewport = Viewport(self.player.pos, self.player.radius)
         for i in range(GRID_COLS * GRID_ROWS):
             self.map_grid.append(list())
@@ -88,17 +89,6 @@ class Game:
             grid_row = p.y // GRID_SIZE
             self.map_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
 
-        # testing for scale
-        # new_cell = Cell(1, Vector2D(1200, 600), CELL_RADIUS, Color.RED)
-        # grid_col = 1200 // GRID_SIZE
-        # grid_row = 600 // GRID_SIZE
-        # self.map_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
-
-        # other = Cell(2, Vector2D(1600, 900), CELL_RADIUS, Color.RED)
-        # grid_col = 1600 // GRID_SIZE
-        # grid_row = 900 // GRID_SIZE
-        # self.map_grid[grid_col + grid_row * GRID_COLS].append(other)
-
         self.is_running = True
 
     def game_draw(self):
@@ -108,8 +98,6 @@ class Game:
         borders_up_left = (borders_up_left[0]/self.viewport.scale, borders_up_left[1]/self.viewport.scale)
         borders_size = (MAP_WIDTH/self.viewport.scale, MAP_HEIGHT/self.viewport.scale)
         map_borders = pygame.draw.rect(self.window, Color.BLACK.value, (borders_up_left, borders_size), 1)
-
-        pygame.draw.rect(self.window, Color.BLACK.value, ((20, 10), (40, 20)), 1)
 
         for grid_cell in self.map_grid:
             for cell in grid_cell:
