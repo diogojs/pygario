@@ -62,16 +62,20 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.is_running = False
+                elif event.key == pygame.K_PAGEUP:
+                    self.player.radius = self.player.radius*2
                 
             elif event.type == pygame.MOUSEMOTION:
                 self.__class__.Mouse.x = event.pos[0]
                 self.__class__.Mouse.y = event.pos[1]
 
+
     def initialize(self):
         """
         Create Game main variables (player, map, cells/blobs)
         """
-        self.player = Blob(0, Vector2D(INITIAL_RADIUS, INITIAL_RADIUS), INITIAL_RADIUS, Color.BLUE)
+        self.player = Blob(0, Vector2D(1500, 850), INITIAL_RADIUS, Color.BLUE)
+        self.viewport = Viewport(self.player.pos, self.player.radius)
         for i in range(GRID_COLS * GRID_ROWS):
             self.map_grid.append(list())
 
@@ -84,22 +88,37 @@ class Game:
             grid_row = p.y // GRID_SIZE
             self.map_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
 
+        # testing for scale
+        # new_cell = Cell(1, Vector2D(1200, 600), CELL_RADIUS, Color.RED)
+        # grid_col = 1200 // GRID_SIZE
+        # grid_row = 600 // GRID_SIZE
+        # self.map_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
+
+        # other = Cell(2, Vector2D(1600, 900), CELL_RADIUS, Color.RED)
+        # grid_col = 1600 // GRID_SIZE
+        # grid_row = 900 // GRID_SIZE
+        # self.map_grid[grid_col + grid_row * GRID_COLS].append(other)
+
         self.is_running = True
 
     def game_draw(self):
         self.window.fill(Color.WHITE.value)
-        viewport = Viewport(Vector2D(WINDOW_WIDTH/2, WINDOW_HEIGHT/2) - self.player.pos, self.player.radius)
 
-        map_edges = pygame.draw.rect(self.window, Color.BLACK.value, (viewport.center.x, viewport.center.y, MAP_WIDTH, MAP_HEIGHT), 1)
+        borders_up_left = (-self.viewport.up_left.x, -self.viewport.up_left.y)
+        borders_up_left = (borders_up_left[0]/self.viewport.scale, borders_up_left[1]/self.viewport.scale)
+        borders_size = (MAP_WIDTH/self.viewport.scale, MAP_HEIGHT/self.viewport.scale)
+        map_borders = pygame.draw.rect(self.window, Color.BLACK.value, (borders_up_left, borders_size), 1)
+
+        pygame.draw.rect(self.window, Color.BLACK.value, ((20, 10), (40, 20)), 1)
 
         for grid_cell in self.map_grid:
             for cell in grid_cell:
-                cell.draw(self.window, viewport)
+                cell.draw(self.window, self.viewport)
 
         for obj in self.blobs:
-            obj.draw(self.window, viewport)
+            obj.draw(self.window, self.viewport)
 
-        self.player.draw(self.window, viewport)
+        self.player.draw(self.window, self.viewport)
 
         # update window
         pygame.display.update()
@@ -113,3 +132,4 @@ class Game:
             obj.update(deltatime)
 
         self.player.update(deltatime)
+        self.viewport.update(self.player.pos, self.player.radius)

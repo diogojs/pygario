@@ -19,6 +19,6 @@ class Label(GameObject):
 
     def draw(self, window: pygame.Surface, viewport: Viewport) -> None:
         actual_color = self.color if isinstance(self.color, tuple) else self.color.value
-        position_in_viewport = (self.pos.x + viewport.center.x, self.pos.y + viewport.center.y)
+        position_in_viewport = (self.pos.x + viewport.up_left.x, self.pos.y + viewport.up_left.y)
         txt = self.font.render(self.text, True, actual_color)
         window.blit(txt, position_in_viewport)
