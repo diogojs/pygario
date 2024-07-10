@@ -1,7 +1,7 @@
 from typing import Union
 import pygame
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pygario.constants import MINIMUM_RADIUS
 from pygario.game_object import GameObject
 from pygario.color import Color

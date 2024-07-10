@@ -1,9 +1,9 @@
 * client
 
 must have:
-[] check collision only for nearby cells/blobs (on player.py)
-[] when eating a cell/blob, send message to server
+[X] check collision only for nearby cells/blobs (on player.py)
 [] lerp radius increasing when eating (should not be instanteaneous)
+[] when eating a cell/blob, send message to server
 [] implement blob border waving/flickering
 [] implement flattening of blob when pressing to the edges of the map
 [] player splitting (when press SPACE)

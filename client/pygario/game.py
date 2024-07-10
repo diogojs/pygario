@@ -52,7 +52,7 @@ class Game:
             self.game_update(deltatime)
 
             # draw objects
-            self.game_draw()
+            self.game_draw(deltatime)
         
         pygame.quit()
 
@@ -70,7 +70,6 @@ class Game:
             elif event.type == pygame.MOUSEMOTION:
                 self.__class__.Mouse.x = event.pos[0]
                 self.__class__.Mouse.y = event.pos[1]
-
 
     def initialize(self):
         """
@@ -106,8 +105,9 @@ class Game:
             self.blobs_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
 
         self.is_running = True
+        self.font = pygame.font.SysFont("comicsans", 12)
 
-    def game_draw(self):
+    def game_draw(self, deltatime: float):
         self.window.fill(Color.WHITE.value)
 
         borders_up_left = (-self.viewport.up_left.x, -self.viewport.up_left.y)
@@ -124,6 +124,11 @@ class Game:
                 obj.draw(self.window, self.viewport)
 
         self.player.draw(self.window, self.viewport)
+
+        # debug info
+        txt = self.font.render(f"deltatime: {deltatime}\nFPS: {1000/deltatime}", True, Color.BLACK.value)
+        position_in_viewport = (10, 10)
+        self.window.blit(txt, position_in_viewport)
 
         # update window
         pygame.display.update()
