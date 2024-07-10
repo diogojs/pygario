@@ -1,8 +1,7 @@
-from pygario.constants import INITIAL_RADIUS, WINDOW_WIDTH, WINDOW_HEIGHT
+from pygario.constants import INITIAL_RADIUS, SCALE_MULTIPLIER, WINDOW_WIDTH, WINDOW_HEIGHT
 from pygario.vector import Vector2D
 
 class Viewport():
-    SCALE_MULTIPLIER = 0.05
     SCALE_DAMPING = {
         1: 0.4,
         5: 0.2,
@@ -29,4 +28,4 @@ class Viewport():
         # for limit, damping in self.SCALE_DAMPING.items():
         #     if ratio > limit:
         #         multiplier = damping
-        self.scale = 1 + (ratio - 1) * self.SCALE_MULTIPLIER
+        self.scale = 1 + (ratio - 1) * SCALE_MULTIPLIER
