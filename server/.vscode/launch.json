@@ -8,8 +8,7 @@
             "name": "Python Debugger: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "pygario",
-            "args": "192.168.100.214"
+            "module": "pygario_server"
         }
     ]
 }

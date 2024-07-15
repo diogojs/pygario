@@ -17,6 +17,9 @@ class Player(Blob):
     
     def update(self, deltatime: int):
         from pygario.game import Game
+
+        self.eaten = []
+
         dist = Game.Mouse - Vector2D(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
         if (dist.magnitude() < INITIAL_RADIUS/4):
             return
@@ -27,6 +30,22 @@ class Player(Blob):
 
         self.check_collisions(Game.map_grid)
         self.check_collisions(Game.blobs_grid)
+
+        self.update_server()
+
+    
+    def update_server(self):
+        from pygario.game import Game
+
+        if len(self.eaten) > 0:
+            # {other_id: int, x: float, y: float, radius: float, velocity: vector2d} 
+            data = f"eat;{self.pos.x},{self.pos.y},{self.radius},"
+            for eat in self.eaten:
+                data += f"{eat.id},"
+            Game.client.send(data.encode())
+        else:
+            data = f"move;{self.pos.x},{self.pos.y},{self.radius}"
+            Game.client.send(data.encode())
     
     def check_collisions(self, cells_grid: List[List[Cell]]):
         import math
@@ -45,8 +64,10 @@ class Player(Blob):
                     if self.radius > obj.radius:
                         dist = (self.pos - obj.pos).magnitude()
                         if dist < self.radius:
+                            print(f"ate {obj.id}")
                             self.radius = math.sqrt(self.radius**2 + obj.radius**2)
-                            grid_cell.remove(obj)  # TODO: send message to server
+                            self.eaten.append(obj)
+                            grid_cell.remove(obj)
 
     def _keep_inside_map(self):
         if self.pos.x < self.radius:

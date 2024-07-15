@@ -2,6 +2,7 @@ import sys
 import contextlib
 
 from pygario.blob import Blob
+from pygario.client import Client
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -22,6 +23,7 @@ class Game:
     player: Player
     blobs_grid: List[List[Blob]] = list()
     map_grid: List[List[Cell]] = list()
+    client: Client = None
 
     @staticmethod
     def setup_pygame() -> pygame.Surface:
@@ -32,10 +34,11 @@ class Game:
         return window
 
     def run(self):
-        HOST = "localhost"
+        host = "localhost"
         if len(sys.argv) > 1:
-            HOST = sys.argv[1]
-        
+            host = sys.argv[1]
+        Game.client = Client(host, PORT)
+
         self.window = self.setup_pygame()
         clock = pygame.time.Clock()
 
@@ -68,43 +71,32 @@ class Game:
                     self.player.radius = self.player.radius*2
                 
             elif event.type == pygame.MOUSEMOTION:
-                self.__class__.Mouse.x = event.pos[0]
-                self.__class__.Mouse.y = event.pos[1]
+                Game.Mouse.x = event.pos[0]
+                Game.Mouse.y = event.pos[1]
 
     def initialize(self):
         """
         Create Game main variables (player, map, cells/blobs)
         """
-        # initial_pos = Vector2D(randint(INITIAL_RADIUS, MAP_WIDTH-INITIAL_RADIUS), randint(INITIAL_RADIUS, MAP_HEIGHT-INITIAL_RADIUS))
-        initial_pos = Vector2D(INITIAL_RADIUS, INITIAL_RADIUS)
-        self.player = Player(0, initial_pos, INITIAL_RADIUS, Color.BLUE, "Player1")
-        self.viewport = Viewport(self.player.pos, self.player.radius)
-        for i in range(GRID_COLS * GRID_ROWS):
-            self.map_grid.append(list())
-            self.blobs_grid.append(list())
+        self.client.connect("Diogo")
+        cmd, data = self.client.get_data()
 
-        # initialize map grid
-        for i in range(NUMBER_OF_CELLS):
-            p = Vector2D(randint(0, MAP_WIDTH-1), randint(0, MAP_HEIGHT-1))
-            r, g, b = randint(0, 6)*40, randint(0, 6)*40, randint(0, 6)*40
-            new_cell = Cell(i+1, p, CELL_RADIUS, (r, g, b))
-            grid_col = p.x // GRID_SIZE
-            grid_row = p.y // GRID_SIZE
-            self.map_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
-        
-        b = Blob(123456, Vector2D(100, 100), 30, (200, 50, 50), "mari")
-        grid_col = b.pos.x // GRID_SIZE
-        grid_row = b.pos.y // GRID_SIZE
-        self.blobs_grid[grid_col + grid_row * GRID_COLS].append(b)
-        for i in range(NUMBER_OF_CELLS, NUMBER_OF_CELLS+10):
-            p = Vector2D(randint(0, MAP_WIDTH-1), randint(0, MAP_HEIGHT-1))
-            r, g, b = randint(0, 6)*40, randint(0, 6)*40, randint(0, 6)*40
-            new_cell = Blob(i+1, p, CELL_RADIUS*randint(5, 10), (r, g, b), f"joana{i}")
-            grid_col = p.x // GRID_SIZE
-            grid_row = p.y // GRID_SIZE
-            self.blobs_grid[grid_col + grid_row * GRID_COLS].append(new_cell)
+        if cmd == 'update':
+            player_blob, cells, blobs = self.client.deserialize(data)
+
+        # initial_pos = Vector2D(INITIAL_RADIUS, INITIAL_RADIUS)
+        self.player = Player(
+            player_blob.id,
+            player_blob.pos,
+            player_blob.radius,
+            player_blob.color,
+            player_blob.name
+            )
+        Game.map_grid = cells
+        Game.blobs_grid = blobs
 
         self.is_running = True
+        self.viewport = Viewport(self.player.pos, self.player.radius)
         self.font = pygame.font.SysFont("comicsans", 12)
 
     def game_draw(self, deltatime: float):
@@ -115,11 +107,11 @@ class Game:
         borders_size = (MAP_WIDTH/self.viewport.scale, MAP_HEIGHT/self.viewport.scale)
         map_borders = pygame.draw.rect(self.window, Color.BLACK.value, (borders_up_left, borders_size), 1)
 
-        for grid_cell in self.map_grid:
+        for grid_cell in Game.map_grid:
             for cell in grid_cell:
                 cell.draw(self.window, self.viewport)
 
-        for grid_cell in self.blobs_grid:
+        for grid_cell in Game.blobs_grid:
             for obj in grid_cell:
                 obj.draw(self.window, self.viewport)
 
@@ -134,6 +126,8 @@ class Game:
         pygame.display.update()
 
     def game_update(self, deltatime: float):
+        self.update_map()
+
         for grid_cell in self.map_grid:
             for cell in grid_cell:
                 cell.update(deltatime)
@@ -144,3 +138,17 @@ class Game:
 
         self.player.update(deltatime)
         self.viewport.update(self.player.pos, self.player.radius)
+
+    def update_map(self):
+        cmd, data = self.client.get_data()
+        if cmd == 'update':
+            player_blob, cells, blobs = self.client.deserialize(data)
+
+        Game.map_grid = cells
+        Game.blobs_grid = blobs
+    
+    def _find_cell_in_map(self, id: int, grid_cell: List[Cell]) -> int:
+        for i in range(len(grid_cell)):
+            if grid_cell[i].id == id:
+                return i
+        return -1
