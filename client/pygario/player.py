@@ -17,6 +17,7 @@ class Player(Blob):
     
     def update(self, deltatime: int):
         from pygario.game import Game
+        from pygario.scenes.main_scene import MainScene
 
         self.eaten = []
 
@@ -28,12 +29,12 @@ class Player(Blob):
         self.move(dist)
         self._keep_inside_map()
 
-        self.check_collisions(Game.map_grid)
-        self.check_collisions(Game.blobs_grid)
+        self.check_collisions(MainScene.map_grid)
+        self.check_collisions(MainScene.blobs_grid)
 
         self.update_server()
 
-    
+
     def update_server(self):
         from pygario.game import Game
 

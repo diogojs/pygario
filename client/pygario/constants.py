@@ -24,5 +24,5 @@ SCALE_MULTIPLIER = 0.05
 
 # Network values
 PORT = 54321
-MAX_DATA_SIZE = 20480
+MAX_DATA_SIZE = 2048*20
 AVAILABLE_COMMANDS = ('update', 'kick', 'error', 'ok')

@@ -110,8 +110,8 @@ def deserialize_cell(data: bytes) -> Tuple[Cell, bytes]:
     pos_x, data = get_float(data)
     pos_y, data = get_float(data)
     radius, data = get_float(data)
-    color = Color.get_random()
-    return Cell(id, Vector2D(pos_x, pos_y), radius, color), data
+    r, g, b, data = get_color(data)
+    return Cell(id, Vector2D(pos_x, pos_y), radius, (r, g, b)), data
 
 def deserialize_cells(data: bytes, map_grid: List[List[Cell]]) -> bytes:
     assert data[0] == ord('['), f"Something wrong with received data for cells: {data}"
@@ -156,3 +156,9 @@ def get_float(data: bytes) -> Tuple[float, bytes]:
     value = data[:index]
     data = data[index+1:]
     return float(value), data
+
+def get_color(data: bytes) -> Tuple[int, int, int, bytes]:
+    r, data = get_int(data)
+    g, data = get_int(data)
+    b, data = get_int(data)
+    return r, g, b, data

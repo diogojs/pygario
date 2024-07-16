@@ -64,7 +64,7 @@ class Server:
         - 'error': {msg: str}
         """
         # handle start and create player
-        data = conn.recv(MAX_DATA_SIZE)
+        data = conn.recv(MAX_RECV_DATA_SIZE)
         cmd, data = self.get_command_and_data(data)
         if cmd != 'start':
             conn.send(b'error;First message should be "start".')
@@ -89,7 +89,7 @@ class Server:
                     self.eaten_players.remove(id)
                 break
             try:
-                data = conn.recv(MAX_DATA_SIZE)
+                data = conn.recv(MAX_RECV_DATA_SIZE)
                 cmd, data = self.get_command_and_data(data)
                 data = data[0]
 
@@ -171,9 +171,9 @@ class Server:
     
     def create_cells(self, number: int) -> None:
         for i in range(number):
-            p = Vector2D(randint(0, MAP_WIDTH-1), randint(0, MAP_HEIGHT-1))
-            # r, g, b = randint(0, 6)*40, randint(0, 6)*40, randint(0, 6)*40
-            new_cell = Cell(self.get_new_id(), p, CELL_RADIUS)
+            p = Vector2D(randint(1, MAP_WIDTH-2), randint(1, MAP_HEIGHT-2))
+            r, g, b = randint(0, 6)*40, randint(0, 6)*40, randint(0, 6)*40
+            new_cell = Cell(self.get_new_id(), p, CELL_RADIUS, (r, g, b))
             self.cells[new_cell.id] = new_cell
     
     def get_start_position(self) -> Vector2D:
