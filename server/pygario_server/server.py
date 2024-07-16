@@ -36,10 +36,11 @@ class Server:
         self.eaten_players = list()
 
         self.initialize_map()
+        start_new_thread(self.generate_more_cells, ())
 
-        is_running = True
+        self.is_running = True
         self.active_players = 0
-        while is_running:
+        while self.is_running:
             if self.active_players < PLAYER_LIMIT:
                 # keep accepting new connections
                 connection, addr = self.socket.accept()
@@ -47,6 +48,12 @@ class Server:
 
                 self.active_players += 1
                 start_new_thread(self.threaded_client, (connection, self.get_new_id()))
+
+    def generate_more_cells(self):
+        while self.is_running:
+            if len(self.cells) < NUMBER_OF_CELLS:
+                self.create_cells(NUMBER_OF_CELLS // 10)
+            sleep(1)
 
     def threaded_client(self, conn: socket.socket, id: int) -> None:
         """
@@ -96,32 +103,38 @@ class Server:
                 if cmd == "move":
                     # data = {x: float, y: float, velocity: vector2d}
                     # TODO: validate motion velocity and new position
-                    x, data = get_float(data)
-                    y, data = get_float(data)
-                    self.move_player(id, x, y)
-                    self.send_all_data_to(conn, player)
+                    try:
+                        x, data = get_float(data)
+                        y, data = get_float(data)
+                        self.move_player(id, x, y)
+                        self.send_all_data_to(conn, player)
+                    except:
+                        print(f"Error on 'move': {data}")
 
                 elif cmd == "eat":
                     # data = {x: float, y: float, radius: float, velocity: vector2d, other_id: int} 
                     # TODO: check if collision really happen and eating was valid
-                    x, data = get_float(data)
-                    y, data = get_float(data)
-                    radius, data = get_float(data)
-                    while data:
-                        other_id, data = get_int(data)
-                        removed = False
-                        if other_id in self.players:
-                            removed = True
-                            self.eaten_players.append(other_id)
-                            del self.players[other_id]
-                        elif other_id in self.cells:
-                            removed = True
-                            del self.cells[other_id]
-                    
-                    self.move_player(id, x, y, radius)
-                    
-                    back_data = f"ok;{removed}"
-                    conn.send(back_data.encode())
+                    try:
+                        x, data = get_float(data)
+                        y, data = get_float(data)
+                        radius, data = get_float(data)
+                        while data:
+                            other_id, data = get_int(data)
+                            removed = False
+                            if other_id in self.players:
+                                removed = True
+                                self.eaten_players.append(other_id)
+                                del self.players[other_id]
+                            elif other_id in self.cells:
+                                removed = True
+                                del self.cells[other_id]
+                        
+                        self.move_player(id, x, y, radius)
+                        
+                        back_data = f"ok;{removed}"
+                        conn.send(back_data.encode())
+                    except:
+                        print(f"Error on 'eat': {data}")
 
                 elif cmd == "get":
                     self.send_all_data_to(conn, player)
@@ -171,22 +184,22 @@ class Server:
     
     def create_cells(self, number: int) -> None:
         for i in range(number):
-            p = Vector2D(randint(1, MAP_WIDTH-2), randint(1, MAP_HEIGHT-2))
+            p = self.get_start_position(2)
             r, g, b = randint(0, 6)*40, randint(0, 6)*40, randint(0, 6)*40
             new_cell = Cell(self.get_new_id(), p, CELL_RADIUS, (r, g, b))
             self.cells[new_cell.id] = new_cell
     
-    def get_start_position(self) -> Vector2D:
+    def get_start_position(self, margin: float = INITIAL_RADIUS) -> Vector2D:
         """
         Pick a random position to spawn a player, ensuring it is not inside
         another player
         """
         while True:
-            pos = Vector2D(randint(INITIAL_RADIUS, MAP_WIDTH-INITIAL_RADIUS), randint(INITIAL_RADIUS, MAP_HEIGHT-INITIAL_RADIUS))
+            pos = Vector2D(randint(margin, MAP_WIDTH-margin), randint(margin, MAP_HEIGHT-margin))
             new_blob = Blob(-1, pos, INITIAL_RADIUS, "", (0,0,0))
             
             for player in self.players.values():
-                if player.check_collision(new_blob, INITIAL_RADIUS):
+                if player.check_collision(new_blob, margin):
                     break
             else:
                 return pos
@@ -214,10 +227,22 @@ def get_int(data: bytes) -> Tuple[int, bytes]:
     index = data.find(b',')
     value = data[:index]
     data = data[index+1:]
-    return int(value), data
+    try:
+        v = int(value)
+    except Exception as e:
+        print("get_int")
+        print(e)
+        raise
+    return v, data
 
 def get_float(data: bytes) -> Tuple[float, bytes]:
     index = data.find(b',')
     value = data[:index]
     data = data[index+1:]
-    return float(value), data
+    try:
+        v = float(value)
+    except Exception as e:
+        print("get_float")
+        print(e)
+        raise
+    return v, data

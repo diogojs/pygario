@@ -27,9 +27,9 @@ must have:
 [X] receive connection of new player, generate data and send it back
 [X] receive eat msg
 [X] receive moving/updating msg
-[] store color of cells as well because otherwise it's being randomized each frame on the client
+[X] store color of cells as well because otherwise it's being randomized each frame on the client
     [] or change so server don't send the whole map, but only what changed (could be 2 lists one for added/changed cells and other for removed cells)
 [] validate move and eating
-[] regularly generate new cells
+[X] regularly generate new cells
 [] broadcast state each clock tick (or when there is any changes)
 [] receive disconnect msg and remove player from the map
