@@ -14,4 +14,4 @@ class Cell:
 
     def serialize(self) -> bytes:
         color_str = ','.join(str(c) for c in self.color)
-        return f"{self.id},{self.pos.x},{self.pos.y},{self.radius},{color_str}".encode('utf-8')
+        return f"{self.id},{self.pos.x:.6},{self.pos.y:.6},{self.radius:.6},{color_str}".encode('utf-8')

@@ -118,9 +118,9 @@ class Server:
                         x, data = get_float(data)
                         y, data = get_float(data)
                         radius, data = get_float(data)
+                        removed = False
                         while data:
                             other_id, data = get_int(data)
-                            removed = False
                             if other_id in self.players:
                                 removed = True
                                 self.eaten_players.append(other_id)
@@ -194,8 +194,14 @@ class Server:
         Pick a random position to spawn a player, ensuring it is not inside
         another player
         """
+        from random import random
+
         while True:
-            pos = Vector2D(randint(margin, MAP_WIDTH-margin), randint(margin, MAP_HEIGHT-margin))
+            x = random() * MAP_WIDTH
+            x = x + margin if x < margin else (x - margin if x > MAP_WIDTH-margin else x)
+            y = random() * MAP_HEIGHT
+            y = y + margin if y < margin else (y - margin if y > MAP_HEIGHT-margin else y)
+            pos = Vector2D(x, y)
             new_blob = Blob(-1, pos, INITIAL_RADIUS, "", (0,0,0))
             
             for player in self.players.values():

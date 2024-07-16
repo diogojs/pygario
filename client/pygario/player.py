@@ -40,12 +40,12 @@ class Player(Blob):
 
         if len(self.eaten) > 0:
             # {other_id: int, x: float, y: float, radius: float, velocity: vector2d} 
-            data = f"eat;{self.pos.x},{self.pos.y},{self.radius},"
+            data = f"eat;{self.pos.x:.6},{self.pos.y:.6},{self.radius:.6},"
             for eat in self.eaten:
                 data += f"{eat.id},"
             Game.client.send(data.encode())
         else:
-            data = f"move;{self.pos.x},{self.pos.y},{self.radius}"
+            data = f"move;{self.pos.x:.6},{self.pos.y:.6},{self.radius:.6}"
             Game.client.send(data.encode())
     
     def check_collisions(self, cells_grid: List[List[Cell]]):
