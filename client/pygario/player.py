@@ -9,6 +9,12 @@ from pygario.constants import *
 
 @dataclass
 class Player(Blob):
+    def __post_init__(self):
+        self.target_radius = self.radius
+        self.lerp_time = 0.0
+        self.max_lerp_time = 1000.0
+        return super().__post_init__()
+
     def move(self, dx: float, dy: float):
         self.pos.add(Vector2D(dx, dy))
     
@@ -18,6 +24,8 @@ class Player(Blob):
     def update(self, deltatime: int):
         from pygario.game import Game
         from pygario.scenes.main_scene import MainScene
+
+        self.adjust_radius(deltatime)
 
         self.eaten = []
 
@@ -33,6 +41,20 @@ class Player(Blob):
         self.check_collisions(MainScene.blobs_grid)
 
         self.update_server()
+
+    def adjust_radius(self, deltatime):
+        from pygario.engine.geometry import lerp
+
+        if self.target_radius != self.radius:
+            if (self.lerp_time > self.max_lerp_time):
+                self.lerp_time = self.max_lerp_time
+            
+            t = self.lerp_time / self.max_lerp_time
+            self.radius = lerp(self.radius, self.target_radius, t)
+            
+            self.lerp_time += deltatime
+        else:
+            self.lerp_time = 0.0
 
 
     def update_server(self):
@@ -66,7 +88,7 @@ class Player(Blob):
                         dist = (self.pos - obj.pos).magnitude()
                         if dist < self.radius:
                             print(f"ate {obj.id}")
-                            self.radius = math.sqrt(self.radius**2 + obj.radius**2)
+                            self.target_radius = math.sqrt(self.radius**2 + obj.radius**2)
                             self.eaten.append(obj)
                             grid_cell.remove(obj)
 

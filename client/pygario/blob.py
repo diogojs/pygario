@@ -17,6 +17,7 @@ class Blob(Cell):
 
     def __post_init__(self):
         self.label = Label(999, self.pos, self.name, Color.WHITE)
+        self.old_radius = self.radius
 
     def draw(self, window: pygame.Surface, viewport: Viewport) -> None:
         actual_color = self.color if isinstance(self.color, tuple) else self.color.value
