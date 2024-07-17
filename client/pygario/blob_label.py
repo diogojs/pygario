@@ -9,21 +9,21 @@ from pygario.viewport import Viewport
 
 
 @dataclass
-class Label(GameObject):
+class BlobLabel(GameObject):
     text: str
     color: Union[tuple, Color] = Color.BLACK
     font: pygame.font.Font = field(init=False)
 
     def __post_init__(self):
-        self.INITIAL_FONT_SIZE = 12
-        self.FONT_SIZE = 12
+        self.INITIAL_FONT_SIZE = 16
+        self.FONT_SIZE = 16
         self.font = pygame.font.SysFont("comicsans", self.FONT_SIZE)
 
     def draw(self, window: pygame.Surface, viewport: Viewport, **kwargs) -> None:
         radius = kwargs['radius'] if 'radius' in kwargs else INITIAL_RADIUS
         ratio = radius / INITIAL_RADIUS
         scale = 1 + (ratio - 1) * SCALE_MULTIPLIER
-        if scale < 3:
+        if scale < 5:
             new_font_size = int(self.INITIAL_FONT_SIZE * scale**2)
             if new_font_size != self.FONT_SIZE:
                 self.FONT_SIZE = new_font_size

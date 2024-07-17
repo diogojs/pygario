@@ -4,6 +4,7 @@ import contextlib
 from pygario.blob import Blob
 from pygario.client import Client
 from pygario.scenes.main_scene import MainScene
+from pygario.scenes.menu_scene import MenuScene
 from pygario.scenes.scene import Scene
 
 with contextlib.redirect_stdout(None):
@@ -40,7 +41,7 @@ class Game:
         Game.clock = pygame.time.Clock()
 
         deltatime = 0
-        Game.scene_stack.append(MainScene())
+        Game.scene_stack.append(MenuScene())
 
         Game.is_running = True
         while Game.is_running:

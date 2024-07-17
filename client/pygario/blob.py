@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from pygario.cell import Cell
 from pygario.constants import MINIMUM_RADIUS
 from pygario.color import Color
-from pygario.label import Label
+from pygario.blob_label import BlobLabel
 from pygario.viewport import Viewport
 
 BORDER_WIDTH = 2
@@ -13,10 +13,10 @@ BORDER_WIDTH = 2
 @dataclass
 class Blob(Cell):
     name: str
-    label: Label = field(init=False)
+    label: BlobLabel = field(init=False)
 
     def __post_init__(self):
-        self.label = Label(999, self.pos, self.name, Color.WHITE)
+        self.label = BlobLabel(-1, self.pos, self.name, Color.WHITE)
         self.old_radius = self.radius
 
     def draw(self, window: pygame.Surface, viewport: Viewport) -> None:

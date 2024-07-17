@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import math
+from typing import Tuple
 
 @dataclass
 class Vector2D:
@@ -31,3 +32,6 @@ class Vector2D:
         old_magnitude = self.magnitude()
         self.x = self.x * scalar/old_magnitude
         self.y = self.y * scalar/old_magnitude
+
+    def tuple(self) -> Tuple[float, float]:
+        return self.x, self.y
