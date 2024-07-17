@@ -39,4 +39,22 @@ class Blob(Cell):
                            position_in_viewport,
                            radius_in_viewport)
 
+        # border-waving implementation
+        # points = []
+        # pi_rad = (math.pi/180)
+        # for i in range(72):
+        #     # TODO: reimplement/refine displacement
+        #     # displacement = random.random() * 5
+        #     cos = radius_in_viewport*math.cos(pi_rad*i*5)
+        #     sin = radius_in_viewport*math.sin(pi_rad*i*5)
+        #     # cos = cos + displacement if cos > 0 else cos - displacement
+        #     # sin = sin + displacement if sin > 0 else sin - displacement
+        #     p = (self.pos.x + cos, self.pos.y + sin)
+        #     p = (p[0] - viewport.up_left.x, p[1] - viewport.up_left.y)
+        #     p = (p[0]/viewport.scale, p[1]/viewport.scale)
+        #     points.append(p)
+
+        # pygame.draw.polygon(window, border_color, points, 10)
+        # pygame.draw.polygon(window, actual_color, points, 0)
+
         self.label.draw(window, viewport, radius=self.radius)

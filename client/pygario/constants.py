@@ -1,7 +1,7 @@
 from pygario.vector import Vector2D
 from pygame.font import Font
 
-INITIAL_RADIUS = 20
+INITIAL_RADIUS = 60
 INITIAL_SPEED = 1
 CELL_RADIUS = 10
 MINIMUM_RADIUS = 5

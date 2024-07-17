@@ -4,13 +4,13 @@ must have:
 [X] check collision only for nearby cells/blobs (on player.py)
 [X] when eating a cell/blob, send message to server
 [X] Send message when moving
-[] lerp radius increasing when eating (should not be instanteaneous)
+[X] lerp radius increasing when eating (should not be instanteaneous)
 [] Implement Menu
     [] Start
     [] Name, Server IP/Port
     [] Quit
 [] use weakreference to optimize
-[] implement blob border waving/flickering
+[] implement blob border waving/flickering -----> refine displacement
 [] implement flattening of blob when pressing to the edges of the map
 [] player splitting (when press SPACE)
 [] player spit mass (when press W)
