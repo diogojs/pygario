@@ -6,9 +6,9 @@ must have:
 [X] Send message when moving
 [X] lerp radius increasing when eating (should not be instanteaneous)
 [] Implement Menu
-    [] Start
+    [X] Start
     [] Name, Server IP/Port
-    [] Quit
+    [X] Quit
 
 good to have:
 [] player splitting (when press SPACE)

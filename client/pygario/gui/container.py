@@ -4,12 +4,12 @@ from typing import List, Tuple
 import pygame
 
 from pygario.gui.ui_component import UIComponent
-from pygario.vector import Vector2D
+
 
 @dataclass
 class Container(UIComponent):
-    corner_radius: float = 0.0
-    border_width: float = 0.0
+    corner_radius: int = 0
+    border_width: int = 0
     border_color: Tuple[int, int, int] = (0,0,0)
     components: List[UIComponent] = field(init=False)
 
@@ -21,7 +21,7 @@ class Container(UIComponent):
             window,
             self.color,
             (self.top_left.x, self.top_left.y, self.width, self.height),
-            border_radius=int(self.corner_radius)
+            border_radius=self.corner_radius
             )
 
         # if self.border_width > 0:
@@ -40,3 +40,7 @@ class Container(UIComponent):
         import weakref
         component.parent = weakref.ref(self)
         self.components.append(component)
+    
+    def update(self, deltatime: float):
+        for component in self.components:
+            component.update(deltatime)

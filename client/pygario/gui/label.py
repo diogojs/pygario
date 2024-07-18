@@ -2,9 +2,8 @@ from typing import Union
 import pygame
 
 from dataclasses import dataclass, field
-from pygario.color import Color
 from pygario.gui.ui_component import UIComponent
-from pygario.viewport import Viewport
+from pygario.vector import Vector2D
 
 
 @dataclass
@@ -15,11 +14,13 @@ class Label(UIComponent):
     font: pygame.font.Font = field(init=False)
 
     def __post_init__(self):
+        super().__post_init__()
         self.font = pygame.font.SysFont("verdana", self.font_size, self.bold)
+        self.rendered_text = self.font.render(self.text, True, self.color)
+        if self.bottom_right is None and self.top_left is not None:
+            self.bottom_right = self.top_left + Vector2D(self.rendered_text.get_rect().width, self.rendered_text.get_rect().height)
 
     def draw(self, window: pygame.Surface) -> None:
-        txt = self.font.render(self.text, True, self.color)
-        
-        parent_position = self.parent.position
-        view_position = parent_position + self.position
-        window.blit(txt, view_position.tuple())
+        if self._center:
+            self.view_position = self.rendered_text.get_rect(center=(self.parent.position + self._center).tuple())
+        window.blit(self.rendered_text, self.view_position)

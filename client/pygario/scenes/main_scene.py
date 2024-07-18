@@ -22,16 +22,16 @@ class MainScene(Scene):
     blobs_grid: List[List[Blob]] = list()
     map_grid: List[List[Cell]] = list()
 
-    def __init__(self):
-        self.initialize()
+    def __init__(self, player_name: str):
+        self.initialize(player_name)
 
-    def initialize(self):
+    def initialize(self, player_name: str):
         """
         Create Game main variables (player, map, cells/blobs)
         """
         from pygario.game import Game
 
-        Game.client.connect("Diogo")
+        Game.client.connect(player_name)
         cmd, data = Game.client.get_data()
 
         if cmd == 'update':
@@ -90,6 +90,13 @@ class MainScene(Scene):
 
         self.player.update(deltatime)
         self.viewport.update(self.player.pos, self.player.radius)
+
+    def finish(self):
+        from pygario.game import Game
+
+        self.update = lambda x: None
+        self.draw = lambda x, y: None
+        Game.client.disconnect()
 
     def update_map(self):
         from pygario.game import Game

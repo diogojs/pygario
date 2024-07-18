@@ -20,6 +20,7 @@ class Game:
     client: Client = None
     scene_stack: List[Scene] = list()
     Mouse = Vector2D(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+    MouseClick = False
     clock: pygame.time.Clock = None
     is_running: bool = False
 
@@ -47,6 +48,9 @@ class Game:
         while Game.is_running:
             deltatime = Game.clock.tick(144)
 
+            if len(Game.scene_stack) == 0:
+                Game.is_running = False
+                break
             current_scene = Game.scene_stack[-1]
 
             # handle mouse events
@@ -59,3 +63,12 @@ class Game:
             current_scene.draw(self.window, deltatime)
         
         pygame.quit()
+
+    @classmethod
+    def add_scene(cls, scene: Scene):
+        Game.scene_stack.append(scene)
+
+    @classmethod
+    def pop_scene(cls):
+        scene = Game.scene_stack.pop()
+        scene.finish()

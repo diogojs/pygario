@@ -16,13 +16,24 @@ class Vector2D:
         self.y -= other.y
 
     def __add__(self, other: 'Vector2D') -> 'Vector2D':
-        x = self.x + other.x
-        y = self.y + other.y
+        if isinstance(other, Vector2D):
+            x = self.x + other.x
+            y = self.y + other.y
+        elif isinstance(other, tuple):
+            x = self.x + other[0]
+            y = self.y + other[1]
+        else:
+            raise TypeError(f"Vector2D can not be added with {type(other)}")
         return Vector2D(x, y)
     
     def __sub__(self, other: 'Vector2D') -> 'Vector2D':
         x = self.x - other.x
         y = self.y - other.y
+        return Vector2D(x, y)
+    
+    def __truediv__(self, scalar: float) -> 'Vector2D':
+        x = self.x / scalar
+        y = self.y / scalar
         return Vector2D(x, y)
     
     def magnitude(self):
